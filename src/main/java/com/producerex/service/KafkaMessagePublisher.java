@@ -1,5 +1,6 @@
 package com.producerex.service;
 
+import com.producerex.dto.Customer;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,7 +25,25 @@ public class KafkaMessagePublisher {
     @Autowired
     private KafkaTemplate<String,Object> template;
 
-    public void sendMessageToTopic(String message){
+    public void sendEventsToTopic(Customer customer) {
+        try {
+            CompletableFuture<SendResult<String, Object>> future = template.send("CustomerEvents", customer);
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    System.out.println("Sent message=[" + customer.toString() +
+                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                } else {
+                    System.out.println("Unable to send message=[" +
+                            customer.toString() + "] due to : " + ex.getMessage());
+                }
+            });
+
+        } catch (Exception ex) {
+            System.out.println("ERROR : "+ ex.getMessage());
+        }
+    }
+
+/*    public void sendMessageToTopic(String message){
         CompletableFuture<SendResult<String, Object>> future = template.send("NewTopic3", message); // "KB-Customer-Topic1"
         future.whenComplete((result,ex)->{
             // for success scenario (when exception ex is null)
@@ -38,5 +57,5 @@ public class KafkaMessagePublisher {
                         message + "] due to : " + ex.getMessage());
             }
         });
-    }
+    }*/
 }

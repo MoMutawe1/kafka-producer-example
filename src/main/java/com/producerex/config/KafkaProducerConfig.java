@@ -17,9 +17,14 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
+    public NewTopic createCustomerTopic(){
+        return new NewTopic("CustomerEvents", 3, (short) 1);
+    }
+
+/*  @Bean
     public NewTopic createTopic(){
         return new NewTopic("NewTopic3", 3, (short) 1);
-    }
+    }*/
 
     @Bean
     public Map<String,Object> producerConfig(){
